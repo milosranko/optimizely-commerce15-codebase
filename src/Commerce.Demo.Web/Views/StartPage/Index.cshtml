@@ -1,0 +1,22 @@
+﻿@using Commerce.Demo.Optimizely.ContentTypes.Cms.Pages
+@using Commerce.Demo.Web.Models.Pages
+@model IPageViewModel<StartPage>
+
+<h1>
+	@Html.PropertyFor(x => x.CurrentPage.Heading)
+</h1>
+
+<p>
+	@Html.PropertyFor(x => x.CurrentPage.LeadText)
+</p>
+
+@Html.PropertyFor(x => x.CurrentPage.Links)
+
+@if (Model.CurrentPage.Links != null && Model.CurrentPage.Links.Any())
+foreach (var item in Model.CurrentPage.Links)
+{
+    <a href="@Url.ContentUrl(new Url(item.Href))" target="@item.Target" title="@item.Title" class="dsp-block color-grey mb-1">@item.Text</a>
+}
+
+@Html.PropertyFor(x => x.CurrentPage.MainContentArea)
+@Html.PropertyFor(x => x.CurrentPage.AnotherMainContentArea)

@@ -1,0 +1,27 @@
+App_Data/
+node_modules/
+artifacts/
+
+# Visual Studio files
+*.user
+*.lock.json
+.vscode/
+.vs/
+.nuget/
+bin/
+obj/
+
+# Optimizely files
+*license.config
+modules/
+
+# OS crap
+.DS_Store
+thumbs.db
+ehthumbs.db
+desktop.ini
+Optimizely.Demo.PublicWeb/log.txt
+.claude/settings.local.json
+appsettings.Development.json
+src/.claude/settings.local.json
+src/Commerce.Demo.Web/wwwroot/dist/

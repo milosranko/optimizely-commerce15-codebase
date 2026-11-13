@@ -1,0 +1,45 @@
+﻿@using Commerce.Demo.Optimizely.ContentTypes.Cms.Media.Base
+@using Commerce.Demo.Web.Helpers
+@using Commerce.Demo.Web.Models.Blocks
+@model BlockViewModel<CarouselItemBlock>
+@inject IContentLoader ContentLoader
+
+@{
+    var imageUrl = string.Empty;
+    var imageAlt = Model.CurrentBlock.Heading ?? string.Empty;
+
+    if (Model.CurrentBlock.BackgroundImage != null && !ContentReference.IsNullOrEmpty(Model.CurrentBlock.BackgroundImage))
+    {
+        imageUrl = UrlResolver.Current.GetUrl(Model.CurrentBlock.BackgroundImage);
+
+        var image = ContentLoader.Get<ImageFileBase>(Model.CurrentBlock.BackgroundImage);
+        if (!string.IsNullOrEmpty(image?.AlternateText))
+        {
+            imageAlt = image.AlternateText;
+        }
+    }
+}
+
+<div class="carousel-item">
+    <div class="carousel-item__background">
+        @if (!string.IsNullOrEmpty(imageUrl) && !PageHelpers.IsInEditMode())
+        {
+            @Html.ImageTagFor(x => x.CurrentBlock.BackgroundImage, ["1024x768", "800x600"])
+        }
+        else if (PageHelpers.IsInEditMode())
+        {
+            @Html.PropertyFor(x => x.CurrentBlock.BackgroundImage)
+        }
+    </div>
+    <div class="carousel-item__content">
+        <h3 class="carousel-item__heading">
+            @Html.PropertyFor(x => x.CurrentBlock.Heading)
+        </h3>
+        <div class="carousel-item__text">
+            @Html.PropertyFor(x => x.CurrentBlock.IntroText)
+        </div>
+        <div class="carousel-item__cta">
+            @Html.PropertyFor(x => x.CurrentBlock.CtaLink)
+        </div>
+    </div>
+</div>

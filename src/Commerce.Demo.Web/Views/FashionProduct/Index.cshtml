@@ -1,0 +1,18 @@
+﻿@using Commerce.Demo.Optimizely.ContentTypes.Commerce.Products
+@using Commerce.Demo.Web.Models.Commerce
+@model ProductViewModel<FashionProduct>
+@{
+    Layout = "~/Views/Shared/Layouts/_ProductLayout.cshtml";
+}
+
+<h1>
+    @Model.CurrentPage.Name
+</h1>
+
+<p>
+    @Model.Code
+</p>
+
+<p>
+    @Model.BannerText
+</p>

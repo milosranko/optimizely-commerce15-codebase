@@ -1,0 +1,46 @@
+﻿@using Commerce.Demo.Optimizely.ContentTypes.Cms.Blocks.Enums
+@using Commerce.Demo.Optimizely.ContentTypes.Cms.Pages.Base
+@using Commerce.Demo.Web.Helpers
+@using Commerce.Demo.Web.Models.Pages
+@model IPageViewModel<PageBasePublic>
+@{
+    Layout = "~/Views/Shared/Layouts/_LayoutBase.cshtml";
+}
+
+@section Metadata
+{
+    @{ await Html.RenderPartialAsync("_MetaData", Model.Layout); }
+}
+@section HeadSnippets
+{
+    @{
+        await Html.RenderSnippetsAsync(SnippetArea.BeforeClosingHeadTag, Model.Layout.Snippets, Model.Layout.CookiesConsent);
+    }
+}
+@section Header
+{
+    @{ await Html.RenderPartialAsync("_Header", Model); }
+}
+
+@RenderBody()
+
+@section BodySnippets
+{
+    @{
+        await Html.RenderSnippetsAsync(SnippetArea.AfterOpeningBodyTag, Model.Layout.Snippets, Model.Layout.CookiesConsent);
+    }
+}
+@section Footer
+{
+    @{ await Html.RenderPartialAsync("_Footer", Model); }
+}
+@section FooterSnippets
+{
+    @{
+        await Html.RenderSnippetsAsync(SnippetArea.BeforeClosingBodyTag, Model.Layout.Snippets, Model.Layout.CookiesConsent);
+    }
+}
+@section AdditionalScripts
+{
+    @RenderSection("AdditionalScripts", false)
+}

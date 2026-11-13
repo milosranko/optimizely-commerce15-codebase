@@ -1,0 +1,63 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+  <PropertyGroup>
+    <AssemblyVersion>1.0.*</AssemblyVersion>
+    <GenerateAssemblyFileVersionAttribute>false</GenerateAssemblyFileVersionAttribute>
+    <Deterministic>false</Deterministic>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- CMS 13 build; published only to the local D:\Packages feed (see nuget.config). -->
+    <PackageReference Include="CmsContentScaffolding.Optimizely" Version="2.0.0" />
+    <PackageReference Include="CmsContentScaffolding.Shared.Resources" Version="1.3.3" />
+    <!-- Keep every EPiServer.* CMS package on the same patch (13.6.0) to avoid NU1605/NU1608. -->
+    <PackageReference Include="EPiServer.CloudPlatform.Cms" Version="13.6.0" />
+    <PackageReference Include="EPiServer.CloudPlatform.Commerce" Version="15.1.0" />
+    <PackageReference Include="EPiServer.CMS" Version="13.6.0" />
+    <!-- Split out of EPiServer.CMS in 13: needed for AddCmsAspNetIdentity<ApplicationUser>(). -->
+    <PackageReference Include="EPiServer.CMS.UI.AspNetIdentity" Version="13.6.0" />
+    <!-- Split out of EPiServer.CMS in 13: CMS 12 always shipped visitor groups and editors may
+         rely on personalisation in content even where no code mentions it. -->
+    <PackageReference Include="EPiServer.Cms.UI.VisitorGroups" Version="13.6.0" />
+    <!-- Replaces EPiServer.Labs.ContentManager (no CMS 13 build). -->
+    <PackageReference Include="EPiServer.Cms.UI.ContentManager" Version="13.6.0" />
+    <!-- Required by Commerce 15 even with Opti ID switched off: its admin component loads this
+         assembly at startup without declaring it, so without it the site crashes on start
+         (FileNotFoundException 'EPiServer.OptimizelyIdentity') although build and tests pass. -->
+    <PackageReference Include="EPiServer.OptimizelyIdentity" Version="13.6.0" />
+    <PackageReference Include="EPiServer.Commerce" Version="15.5.0" />
+    <!-- Pin: Commerce 15.5.0 pulls EPiServer.Events.ChangeNotification 13.0.2, which requires
+         EPiServer.Framework (= 13.0.2) exactly -> NU1608 against Framework 13.6.0. Align it with the
+         rest of the CMS packages; remove when Commerce depends on a matching version. -->
+    <PackageReference Include="EPiServer.Events.ChangeNotification" Version="13.6.0" />
+    <PackageReference Include="EPiServer.Forms" Version="6.0.2" />
+    <PackageReference Include="EPiServer.Forms.Samples" Version="5.0.0" />
+    <PackageReference Include="EPiServer.Labs.LanguageManager" Version="6.0.0" />
+    <!-- 8.x: security fixes (redirect host injection, CSV formula injection). Its DB schema goes
+         v2 -> v3 at startup, so the DB user needs ALTER on NotFoundHandler.* tables. -->
+    <PackageReference Include="Geta.NotFoundHandler.Optimizely" Version="8.0.0" />
+    <PackageReference Include="Geta.NotFoundHandler.Optimizely.Commerce" Version="8.0.0" />
+    <PackageReference Include="Geta.Optimizely.Categories" Version="2.2.0" />
+    <!-- 5.x: uses the CMS 13 Applications model instead of SiteDefinition. -->
+    <PackageReference Include="Geta.Optimizely.Sitemaps" Version="5.0.0" />
+    <PackageReference Include="Geta.Optimizely.Sitemaps.Commerce" Version="5.0.0" />
+    <PackageReference Include="Mapster" Version="10.0.14" />
+    <!-- Optimizely Graph (Content Graph): search/delivery for CMS + catalog content; replaces Find (ADR-008).
+         Registered in Startup only when Optimizely:ContentGraph keys are configured. -->
+    <PackageReference Include="Optimizely.Graph.Cms" Version="13.6.0" />
+    <PackageReference Include="Optimizely.Graph.Commerce" Version="15.5.0" />
+    <PackageReference Include="Stott.Optimizely.RobotsHandler" Version="7.0.1" />
+    <PackageReference Include="Stott.Security.Optimizely" Version="7.1.1" />
+  </ItemGroup>
+
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+    <Exec Command="if not exist &quot;$(SolutionDir)Commerce.Demo.Web\modules&quot; (mkdir &quot;$(SolutionDir)Commerce.Demo.Web\modules&quot;)" />
+    <Exec Command="xcopy /I /Y /E &quot;$(ProjectDir)modules&quot; &quot;$(SolutionDir)Commerce.Demo.Web\modules&quot;" />
+  </Target>
+
+</Project>

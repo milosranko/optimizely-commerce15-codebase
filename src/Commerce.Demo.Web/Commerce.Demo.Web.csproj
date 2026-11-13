@@ -1,0 +1,57 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <!-- Local secrets (Graph keys, Opti ID, Opal): dotnet user-secrets set "<key>" "<value>" -->
+    <UserSecretsId>c9a506ad-e9cd-4b67-81c8-a13e38d80a7e</UserSecretsId>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <Optimize>False</Optimize>
+  </PropertyGroup>
+  <PropertyGroup>
+    <AssemblyVersion>1.0.*</AssemblyVersion>
+    <GenerateAssemblyFileVersionAttribute>false</GenerateAssemblyFileVersionAttribute>
+    <Deterministic>false</Deterministic>
+  </PropertyGroup>
+
+  <!--<Target Name="CopyReactBuild" BeforeTargets="Build">
+    <Exec Command="npm install" WorkingDirectory="../Commerce.Demo.Frontend" />
+    <Exec Command="npm run build" WorkingDirectory="../Commerce.Demo.Frontend" />
+    <RemoveDir Directories="wwwroot/dist" />
+    <MakeDir Directories="wwwroot/dist" />
+    <Copy SourceFiles="@(ReactDistFiles)" DestinationFolder="wwwroot/dist/%(RecursiveDir)" />
+  </Target>
+  <ItemGroup>
+    <ReactDistFiles Include="../Commerce.Demo.Frontend/dist/**/*.*" />
+  </ItemGroup>-->
+
+  <ItemGroup>
+    <Using Include="EPiServer" />
+    <Using Include="EPiServer.Core" />
+    <Using Include="EPiServer.DataAbstraction" />
+    <Using Include="EPiServer.DataAnnotations" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Hangfire.AspNetCore" Version="1.8.*" />
+    <PackageReference Include="Scrutor" Version="7.0.0" />
+    <PackageReference Include="Serilog.AspNetCore" Version="10.0.0" />
+    <PackageReference Include="Serilog.Settings.Configuration" Version="10.0.1" />
+    <PackageReference Include="Serilog.Sinks.File" Version="7.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\Translations\**\*" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Commerce.Demo.Business\Commerce.Demo.Business.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="maintenancepage.htm">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+</Project>

@@ -1,0 +1,43 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<languages>
+  <language name="English" id="en">
+    <cookieaudiencecriteria>
+      <properties>
+        <casesensitive>Case sensitive</casesensitive>
+      </properties>
+    </cookieaudiencecriteria>
+    <enums>
+      <cookieaudiencecriteria>
+        <enums>
+          <cookievaluecondition>
+            <is>Is equal to</is>
+            <contains>Contains</contains>
+            <doesnotcontain>Does not contain</doesnotcontain>
+            <isnot>Is not equal to</isnot>
+            <startswith>Starts with</startswith>
+            <endswith>Ends with</endswith>
+          </cookievaluecondition>
+          <cookieexistscondition>
+            <exists>Exists</exists>
+            <doesnotexist>Does not exist</doesnotexist>
+          </cookieexistscondition>
+        </enums>
+      </cookieaudiencecriteria>
+      <cookiesconsentcriteria>
+        <enums>
+          <cookieusagecondition>
+            <is>Is equal to</is>
+            <isnot>Is not equal to</isnot>
+          </cookieusagecondition>
+          <snippetusage>
+            <essential>Exists</essential>
+            <functional>Functional</functional>
+            <analytics>Analytics</analytics>
+            <performance>Performance</performance>
+            <marketing>Marketing</marketing>
+          </snippetusage>
+        </enums>
+      </cookiesconsentcriteria>
+    </enums>
+  </language>
+</languages>

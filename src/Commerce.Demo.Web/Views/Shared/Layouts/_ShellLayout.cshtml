@@ -1,0 +1,34 @@
+﻿@using EPiServer.Framework.Web.Resources
+@using EPiServer.Shell
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta content='width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no' name='viewport'>
+    <title></title>
+    @ClientResources.RenderResources("ShellCore")
+    @ClientResources.RenderResources("ShellCoreLightTheme")
+    @ClientResources.RenderResources("admin", new[] { ClientResourceType.Style })
+    <style>
+        iframe {
+            height: calc(100vh - 46px);
+            width: 100vw;
+            box-sizing: border-box;
+        }
+    </style>
+    @RenderSection("Styles", false)
+</head>
+<body>
+    @Html.AntiForgeryToken()
+    <platform-navigation />
+    <noscript>You need to enable JavaScript to run this app.</noscript>
+    <platform-navigation-wrapper style="z-index:auto;">
+        @RenderBody()
+    </platform-navigation-wrapper>
+
+    @ClientResources.RenderResources("admin", new[] { ClientResourceType.Script })
+    @RenderSection("Scripts", false)
+</body>
+</html>

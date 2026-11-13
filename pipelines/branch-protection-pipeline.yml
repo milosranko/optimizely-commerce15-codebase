@@ -1,0 +1,36 @@
+# ASP.NET
+# Build and test ASP.NET projects.
+# Add steps that publish symbols, save build artifacts, deploy, and more:
+# https://docs.microsoft.com/azure/devops/pipelines/apps/aspnet/build-aspnet-4
+
+trigger: none
+
+pr:
+- develop
+- main
+
+pool:
+  vmImage: ubuntu-latest
+
+variables:
+  nugetPackagePrefix: 'Project.Name'
+  solution: 'Solution.sln'
+  buildConfiguration: 'Release'
+  buildNumber: '$(Build.BuildId)_$(Build.BuildNumber)'
+
+steps:
+
+- script: dotnet build $(solution) -c $(buildConfiguration)
+  displayName: 'dotnet build $(buildConfiguration)'
+
+- task: DotNetCoreCLI@2
+  displayName: 'dotnet publish'
+  inputs:
+    command: 'publish'
+    publishWebProjects: false
+    projects: '**/StartupProject.Web.csproj'
+    arguments: '-c $(buildConfiguration) -o $(Build.ArtifactStagingDirectory)/Output/wwwroot'
+    zipAfterPublish: false
+    modifyOutputPath: false
+
+# No need to create build artifacts, we are only building for validation purposes

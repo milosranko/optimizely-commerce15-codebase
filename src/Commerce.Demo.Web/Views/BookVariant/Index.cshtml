@@ -1,0 +1,18 @@
+﻿@using Commerce.Demo.Optimizely.ContentTypes.Commerce.Variants
+@using Commerce.Demo.Web.Models.Commerce
+@model VariantViewModel<BookVariant>
+@{
+    Layout = "~/Views/Shared/Layouts/_ProductLayout.cshtml";
+}
+
+<h1>
+    @Model.CurrentPage.Name`
+</h1>
+
+<p>
+    @Model.Code
+</p>
+
+<p>
+    @Model.BannerText
+</p>

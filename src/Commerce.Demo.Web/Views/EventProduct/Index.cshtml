@@ -1,0 +1,31 @@
+﻿@using Commerce.Demo.Optimizely.ContentTypes.Commerce.Products
+@using Commerce.Demo.Web.Models.Commerce
+@model ProductViewModel<EventProduct>
+@{
+    Layout = "~/Views/Shared/Layouts/_ProductLayout.cshtml";
+}
+
+<h1>
+    @Model.CurrentPage.Name
+</h1>
+
+<p>
+    @Model.Code
+</p>
+
+<p>
+    @Model.BannerText
+</p>
+
+@Html.PropertyFor(x => x.CurrentPage.Tabs)
+@Html.PropertyFor(x => x.CurrentPage.PrimaryAccordion)
+@Html.PropertyFor(x => x.CurrentPage.SecondaryAccordion)
+
+@* @if (Model.CurrentPage.Tabs != null && Model.CurrentPage.Tabs.Any())
+{
+    @foreach (var tab in Model.CurrentPage.Tabs)
+    {
+        <h4>@tab.Label</h4>
+        @Html.Raw(tab.Text)
+    }
+} *@

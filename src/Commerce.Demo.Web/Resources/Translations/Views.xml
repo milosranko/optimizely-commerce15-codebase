@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<languages>
+  <language name="English" id="en">
+    <resolutions>
+      <standard>Standard</standard>
+      <ipadhorizontal>iPad Horizontal</ipadhorizontal>
+      <iphonevertical>iPhone Vertical</iphonevertical>
+      <androidvertical>Android Vertical</androidvertical>      
+    </resolutions>
+    <displayoptions>
+      <full>Full width</full>
+      <half>Half width</half>
+      <wide>Wide</wide>
+      <narrow>Narrow</narrow>
+    </displayoptions>
+    <property>
+      <enum>
+        <SnippetPlacement>
+          <BeforeClosingHeadTag>Before Closing Head Tag</BeforeClosingHeadTag>
+          <AfterOpeningBodyTag>After Opening Body Tag</AfterOpeningBodyTag>
+          <BeforeClosingBodyTag>Before Closing Body Tag</BeforeClosingBodyTag>
+        </SnippetPlacement>
+      </enum>
+    </property>
+    <cookieconsent>
+      <title>Cookie consent</title>
+      <customize>Customize</customize>
+      <deny>Deny</deny>
+      <accept>Accept</accept>
+      <acceptall>Accept all</acceptall>
+      <settings>Cookie settings</settings>
+      <essential>Essential</essential>
+      <functional>Functional</functional>
+      <analytics>Analytical</analytics>
+      <performance>Performance</performance>
+      <marketing>Marketing</marketing>
+      <essentialdescription>Essential cookies provide basic functionality of the web site.</essentialdescription>
+      <functionaldescription>Functional cookies control certain functionalities.</functionaldescription>
+      <analyticsdescription>Analytical cookies are used to track user behavior.</analyticsdescription>
+      <performancedescription>Performance cookies are used to track web site performance.</performancedescription>
+      <marketingdescription>Marketing cookies are used to show personalized ads.</marketingdescription>
+    </cookieconsent>
+    <validation>
+      <allowedtypesforxhtmlerror>Content added is not allowed: </allowedtypesforxhtmlerror>
+    </validation>
+  </language>
+</languages>

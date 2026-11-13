@@ -1,0 +1,13 @@
+<Solution>
+  <Project Path="Commerce.Demo.Business/Commerce.Demo.Business.csproj" />
+  <Project Path="Commerce.Demo.Frontend/Commerce.Demo.Frontend.esproj">
+    <Build Solution="Release|*" />
+    <Deploy />
+  </Project>
+  <Project Path="Commerce.Demo.Integrations/Commerce.Demo.Integrations.csproj" />
+  <Project Path="Commerce.Demo.Models/Commerce.Demo.Models.csproj" />
+  <Project Path="Commerce.Demo.Optimizely.ContentTypes/Commerce.Demo.Optimizely.ContentTypes.csproj" />
+  <Project Path="Commerce.Demo.Optimizely.Core/Commerce.Demo.Optimizely.Core.csproj" />
+  <Project Path="Commerce.Demo.Tests/Commerce.Demo.Tests.csproj" />
+  <Project Path="Commerce.Demo.Web/Commerce.Demo.Web.csproj" />
+</Solution>

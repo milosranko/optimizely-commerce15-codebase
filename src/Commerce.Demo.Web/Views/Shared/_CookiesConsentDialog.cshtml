@@ -1,0 +1,215 @@
+﻿@using Commerce.Demo.Models.ViewModels
+@using Commerce.Demo.Optimizely.ContentTypes.Cms.Blocks.Enums
+@model CookiesConsentDialogViewModel
+
+@{
+    HelperResult CookieItemTemplate(IGrouping<SnippetUsage, CookieItemBlockViewModel> item)
+    {
+        var isChecked = item.Key == SnippetUsage.Essential;
+        var usage = item.Key.ToString().ToLower();
+
+        <div>
+            <label for="@usage" class="form-check-label">
+                <b>@LocalizationService.Current.GetString($"/cookieconsent/{usage}")</b>
+            </label>
+            <input type="checkbox" class="form-check-input" role="switch" aria-describedby="@(usage)desc"@(isChecked ? " checked disabled" : string.Empty) id="@usage" />
+            <p id="@(usage)desc">
+                @LocalizationService.Current.GetString($"/cookieconsent/{usage}description")
+                <br>
+                @Html.Raw(string.Join("<br>", item.Select(x => x.Name).ToArray()))
+            </p>
+        </div>
+        return new HelperResult(w => Task.CompletedTask);
+    }
+}
+
+@if (Model != null && 
+    !string.IsNullOrEmpty(Model.CookieName) && 
+    Model.DialogContent != null && 
+    !Model.DialogContent.IsEmpty && 
+    !Model.HideCookiesConsent)
+{
+    var consentExpiryDays = Model.CookieExpirationDate.HasValue && Model.CookieExpirationDate.Value > DateTime.Now
+        ? Math.Max(1, (int)Math.Ceiling((Model.CookieExpirationDate.Value - DateTime.Now).TotalDays))
+        : 365;
+    var cookieSettingsLabel = LocalizationService.Current.GetString("/cookieconsent/settings");
+<button type="button" class="btn btn-sm btn-secondary position-fixed bottom-0 start-0 m-3" id="btnCookieSettings" style="z-index:1080;" aria-label="@cookieSettingsLabel" title="@cookieSettingsLabel">
+    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 16 16" fill="currentColor" role="img" aria-label="@cookieSettingsLabel" focusable="false">
+        <title>@cookieSettingsLabel</title>
+        <path d="M8 4.754a3.246 3.246 0 1 0 0 6.492 3.246 3.246 0 0 0 0-6.492M5.754 8a2.246 2.246 0 1 1 4.492 0 2.246 2.246 0 0 1-4.492 0" />
+        <path d="M9.796 1.343c-.527-1.79-3.065-1.79-3.592 0l-.094.319a.873.873 0 0 1-1.255.52l-.292-.16c-1.64-.892-3.433.902-2.54 2.541l.159.292a.873.873 0 0 1-.52 1.255l-.319.094c-1.79.527-1.79 3.065 0 3.592l.319.094a.873.873 0 0 1 .52 1.255l-.16.292c-.892 1.64.901 3.434 2.541 2.54l.292-.159a.873.873 0 0 1 1.255.52l.094.319c.527 1.79 3.065 1.79 3.592 0l.094-.319a.873.873 0 0 1 1.255-.52l.292.16c1.64.893 3.434-.902 2.54-2.541l-.159-.292a.873.873 0 0 1 .52-1.255l.319-.094c1.79-.527 1.79-3.065 0-3.592l-.319-.094a.873.873 0 0 1-.52-1.255l.16-.292c.893-1.64-.902-3.433-2.541-2.54l-.292.159a.873.873 0 0 1-1.255-.52zm-2.633.283c.246-.835 1.428-.835 1.674 0l.094.319a1.873 1.873 0 0 0 2.693 1.115l.291-.16c.764-.415 1.6.42 1.184 1.185l-.159.292a1.873 1.873 0 0 0 1.116 2.692l.318.094c.835.246.835 1.428 0 1.674l-.319.094a1.873 1.873 0 0 0-1.115 2.693l.16.291c.415.764-.42 1.6-1.185 1.184l-.291-.159a1.873 1.873 0 0 0-2.693 1.116l-.094.318c-.246.835-1.428.835-1.674 0l-.094-.319a1.873 1.873 0 0 0-2.692-1.115l-.292.16c-.764.415-1.6-.42-1.184-1.185l.159-.291A1.873 1.873 0 0 0 1.945 8.93l-.319-.094c-.835-.246-.835-1.428 0-1.674l.319-.094A1.873 1.873 0 0 0 3.06 4.377l-.16-.292c-.415-.764.42-1.6 1.185-1.184l.292.159a1.873 1.873 0 0 0 2.692-1.115z" />
+    </svg>
+</button>
+<div class="fixed-bottom p-4" id="cookiesconsent">
+    <div class="toast bg-dark text-white w-100 mw-100" role="dialog" aria-modal="false" aria-label="@LocalizationService.Current.GetString("/cookieconsent/title")" tabindex="-1" data-autohide="false">
+        <div class="toast-body p-4 d-flex flex-column">
+            @Html.PropertyFor(x => x.DialogContent)
+            @if (Model.ShowCookieTypeSelection && Model.Cookies != null && Model.Cookies.Any())
+            {
+                <div class="form-check form-switch form-check-reverse" id="cookieCategories" style="display:none;">
+                @foreach (var item in Model.Cookies.Distinct().GroupBy(x => x.Usage).OrderBy(x => (int)x.Key))
+                {
+                    @CookieItemTemplate(item)
+                }
+                </div>
+            }
+            <div class="ml-auto">
+                @if (Model.ShowCookieTypeSelection)
+                {
+                <button type="button" class="btn btn-warning" id="btnCustomize" aria-expanded="false" aria-controls="cookieCategories">
+                    @Html.Translate("/cookieconsent/customize")
+                </button>
+                }
+                <button type="button" class="btn btn-success" id="btnDeny">
+                    @Html.Translate("/cookieconsent/deny")
+                </button>
+                <button type="button" class="btn btn-success" id="btnAccept">
+                    @Html.Translate("/cookieconsent/accept")
+                </button>
+                <button type="button" class="btn btn-success" id="btnAcceptAll">
+                    @Html.Translate("/cookieconsent/acceptall")
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    var consentPolicyVersion = '@(Model.PolicyVersion ?? "")';
+    var consentCookieName = '@Model.CookieName';
+    var consentVersionCookieName = consentCookieName + '-policy';
+    var consentExpiryDays = @consentExpiryDays;
+
+    // Persist the consent decision and the policy version it was given against, with the same lifetime.
+    function storeConsent(value) {
+        setCookie(consentCookieName, value, consentExpiryDays);
+        setCookie(consentVersionCookieName, consentPolicyVersion, consentExpiryDays);
+    }
+
+    // Re-check the boxes matching a previously stored decision (used when re-opening the dialog).
+    function applyStoredSelections() {
+        var stored = getCookie(consentCookieName);
+        if (!stored || stored === 'false') return;
+        var selected = stored.split('|');
+        $('#cookiesconsent input[type="checkbox"]').each(function () {
+            if (selected.indexOf(this.id) !== -1) {
+                this.checked = true;
+            }
+        });
+    }
+
+    function auditConsent(action, categories) {
+        fetch('/api/consent/audit', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                action: action,
+                categoriesSelected: categories,
+                cookieName: consentCookieName,
+                policyVersion: consentPolicyVersion
+            })
+        }).catch(function (err) {
+            console.warn('Consent audit failed:', err);
+        });
+    }
+
+    function setCookie(name, value, days) {
+        var expires = "";
+        if (days) {
+            var date = new Date();
+            date.setTime(date.getTime() + (days*24*60*60*1000));
+            expires = "; expires=" + date.toUTCString();
+        }
+        // Secure is only valid over HTTPS; omit it on http so the cookie still sets in local dev.
+        var secure = location.protocol === 'https:' ? "; Secure" : "";
+        document.cookie = name + "=" + (value || "") + expires + "; path=/; SameSite=Lax" + secure;
+    }
+
+    function getCookie(name) {
+        var nameEQ = name + "=";
+        var ca = document.cookie.split(';');
+        for (var i = 0; i < ca.length; i++) {
+            var c = ca[i];
+            while (c.charAt(0) === ' ') c = c.substring(1);
+            if (c.indexOf(nameEQ) === 0) return c.substring(nameEQ.length);
+        }
+        return null;
+    }
+
+    function eraseCookie(name) {
+        document.cookie = name +'=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;';
+    }
+
+    function openConsentDialog() {
+        // Hide the settings trigger while the dialog is up so the two controls never overlap.
+        $('#btnCookieSettings').hide();
+        $('#cookiesconsent .toast').show(500);
+        // Move keyboard/screen-reader focus to the dialog so the consent choice is addressed first.
+        var dialog = document.querySelector('#cookiesconsent .toast');
+        if (dialog) dialog.focus();
+    }
+
+    // Show the dialog when no decision exists yet, or when the policy version has changed since consent was given.
+    function cookieConsent() {
+        var storedVersion = getCookie(consentVersionCookieName);
+        if (!getCookie(consentCookieName) || storedVersion !== consentPolicyVersion) {
+            openConsentDialog();
+        } else {
+            // No dialog needed — make the persistent settings trigger available.
+            $('#btnCookieSettings').show();
+            applyStoredSelections();
+        }
+    }
+
+    // Persistent "Cookie settings" trigger lets visitors review or withdraw consent at any time.
+    $('#btnCookieSettings').click(() => {
+        applyStoredSelections();
+        openConsentDialog();
+    });
+
+    $('#cookiesconsent #btnCustomize').click(() => {
+        var panel = $('#cookiesconsent .form-check');
+        var isHidden = panel.is(":hidden");
+        if (isHidden) {
+            panel.show(500);
+        } else {
+            panel.hide(500);
+        }
+        $('#cookiesconsent #btnCustomize').attr('aria-expanded', isHidden ? 'true' : 'false');
+    })
+
+    $('#cookiesconsent #btnDeny').click(() => {
+        auditConsent('denied', 'false');
+        storeConsent('false');
+        location.reload();
+    })
+
+    $('#cookiesconsent #btnAccept').click(() => {
+        var cookieElements = $('#cookiesconsent input[type="checkbox"]:checked');
+        var selectedCookieTypes = [];
+        $.each(cookieElements, function(index, value) {
+            selectedCookieTypes.push(value.id);
+        });
+
+        auditConsent('modified', selectedCookieTypes.join('|'));
+        storeConsent(selectedCookieTypes.join('|'));
+        location.reload();
+    })
+
+    $('#cookiesconsent #btnAcceptAll').click(() => {
+        var cookieElements = $('#cookiesconsent input[type="checkbox"]');
+        var selectedCookieTypes = [];
+
+        $.each(cookieElements, function(index, value) {
+            selectedCookieTypes.push(value.id);
+        });
+
+        auditConsent('accepted', selectedCookieTypes.join('|'));
+        storeConsent(selectedCookieTypes.join('|'));
+
+        location.reload();
+    })
+
+    cookieConsent();
+</script>
+}

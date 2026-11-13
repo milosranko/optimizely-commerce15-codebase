@@ -1,0 +1,10 @@
+﻿@model CarouselContainerBlock
+
+<div class="carousel-container">
+    <h2 class="carousel-container__heading">
+        @Html.PropertyFor(x => x.Heading)
+    </h2>
+    <div class="carousel-container__items">
+        @Html.PropertyFor(x => x.Items)
+    </div>
+</div>

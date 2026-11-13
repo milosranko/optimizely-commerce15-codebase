@@ -1,0 +1,8 @@
+﻿@using Commerce.Demo.Optimizely.ContentTypes.Commerce.Products
+@model FashionProduct
+
+<p>
+    @Model.Name<br />
+    @Model.Brand<br />
+    <a href="@UrlResolver.Current.GetUrl(Model.ContentLink)">@Model.Name</a>
+</p>

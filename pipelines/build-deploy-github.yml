@@ -1,0 +1,155 @@
+name: Build & Promote Optimizely CMS + React
+
+on:
+  push:
+    branches: [ "develop", "main" ]
+  pull_request:
+    branches: [ "develop", "main" ]
+
+env:
+  DOTNET_VERSION: "10.0.x"
+  NODE_VERSION: "20.x"
+  CMS_PROJECT: "src/Optimizely.Web"
+  FRONTEND_PROJECT: "src/Frontend.React"
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      - name: Restore .NET dependencies
+        run: dotnet restore ${{ env.CMS_PROJECT }}
+
+      - name: Install frontend dependencies
+        working-directory: ${{ env.FRONTEND_PROJECT }}
+        run: npm ci
+
+      - name: Build frontend
+        working-directory: ${{ env.FRONTEND_PROJECT }}
+        run: npm run build
+
+      - name: Clean CMS dist folder
+        run: |
+          if (Test-Path "${{ env.CMS_PROJECT }}/wwwroot/dist") {
+            Remove-Item "${{ env.CMS_PROJECT }}/wwwroot/dist" -Recurse -Force
+          }
+
+      - name: Copy frontend build output
+        run: |
+          New-Item -ItemType Directory -Force -Path "${{ env.CMS_PROJECT }}/wwwroot/dist"
+          Copy-Item "${{ env.FRONTEND_PROJECT }}/dist/*" "${{ env.CMS_PROJECT }}/wwwroot/dist" -Recurse -Force
+
+      - name: Build CMS project
+        run: dotnet build ${{ env.CMS_PROJECT }} --configuration Release --no-restore
+
+      - name: Publish CMS project
+        run: dotnet publish ${{ env.CMS_PROJECT }} --configuration Release --output ./publish
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: cms-build
+          path: publish
+
+  deploy_integration:
+    runs-on: ubuntu-latest
+    needs: build
+    environment:
+      name: integration
+
+    steps:
+      - name: Download build artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: cms-build
+          path: ./deploy
+
+      - name: Install Optimizely PaasPortal CLI
+        run: dotnet tool install --global EPiCloud
+
+      - name: Authenticate to Optimizely PaaS
+        run: |
+          EPiCloud login \
+            --client-id "${{ secrets.OPTIMIZELY_CLIENT_ID }}" \
+            --client-secret "${{ secrets.OPTIMIZELY_CLIENT_SECRET }}"
+
+      - name: Deploy to Integration
+        run: |
+          EPiCloud deploy \
+            --project-id "${{ secrets.OPTIMIZELY_PROJECT_ID }}" \
+            --environment "integration" \
+            --path "./deploy" \
+            --wait
+
+  deploy_preproduction:
+    runs-on: ubuntu-latest
+    needs: deploy_integration
+    environment:
+      name: preproduction
+
+    steps:
+      - name: Download build artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: cms-build
+          path: ./deploy
+
+      - name: Install Optimizely PaasPortal CLI
+        run: dotnet tool install --global EPiCloud
+
+      - name: Authenticate to Optimizely PaaS
+        run: |
+          EPiCloud login \
+            --client-id "${{ secrets.OPTIMIZELY_CLIENT_ID }}" \
+            --client-secret "${{ secrets.OPTIMIZELY_CLIENT_SECRET }}"
+
+      - name: Deploy to Preproduction
+        run: |
+          EPiCloud deploy \
+            --project-id "${{ secrets.OPTIMIZELY_PROJECT_ID }}" \
+            --environment "preproduction" \
+            --path "./deploy" \
+            --wait
+
+  deploy_production:
+    runs-on: ubuntu-latest
+    needs: deploy_preproduction
+    environment:
+      name: production   # manual approval configured in GitHub UI
+
+    steps:
+      - name: Download build artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: cms-build
+          path: ./deploy
+
+      - name: Install Optimizely PaasPortal CLI
+        run: dotnet tool install --global EPiCloud
+
+      - name: Authenticate to Optimizely PaaS
+        run: |
+          EPiCloud login \
+            --client-id "${{ secrets.OPTIMIZELY_CLIENT_ID }}" \
+            --client-secret "${{ secrets.OPTIMIZELY_CLIENT_SECRET }}"
+
+      - name: Deploy to Production
+        run: |
+          EPiCloud deploy \
+            --project-id "${{ secrets.OPTIMIZELY_PROJECT_ID }}" \
+            --environment "production" \
+            --path "./deploy" \
+            --wait
