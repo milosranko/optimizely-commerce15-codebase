@@ -26,9 +26,7 @@ using Commerce.Demo.Web.Filters;
 using Commerce.Demo.Web.Infrastructure;
 using EPiServer.Authorization;
 using EPiServer.CloudPlatform.Cms;
-using EPiServer.Cms.Shell;
 using EPiServer.Cms.Shell.UI;
-using EPiServer.Cms.Shell.UI.Configurations;
 using EPiServer.Cms.Shell.UI.ObjectEditing.EditorDescriptors;
 using EPiServer.Cms.TinyMce.Core;
 using EPiServer.Cms.UI.AspNetIdentity;
@@ -38,7 +36,6 @@ using EPiServer.Commerce.Visistor;
 using EPiServer.DependencyInjection;
 using EPiServer.Framework.Web.Resources;
 using EPiServer.Scheduler;
-using EPiServer.ServiceLocation;
 using EPiServer.Web;
 using EPiServer.Web.Routing;
 using Geta.NotFoundHandler.Infrastructure.Configuration;
@@ -101,9 +98,6 @@ public class Startup
 
         #region Optimizely Services
 
-        // CMS 13: AddCms() must be called explicitly (even with AddCommerce), otherwise the host fails
-        // at startup with "Sequence contains no matching element". Visitor groups and Forms are no
-        // longer switched on by the EPiServer.CMS metapackage.
         services
             .AddCms()
             .AddCommerce()
@@ -112,10 +106,7 @@ public class Startup
             .AddVisitorGroupsMvc()
             .AddVisitorGroupsUI()
             .AddForms()
-            // Must be registered whenever EPiServer.Cms.UI.ContentManager is referenced: its editor
-            // descriptors are auto-discovered and the host fails to start without these services.
             .AddContentManager()
-            // EPiServer.Labs.LanguageManager 6 (CMS 13) must be registered explicitly; 5.x registered itself.
             .AddLanguageManager()
             .AddEmbeddedLocalization<Startup>()
             .AddRobotsHandler()
